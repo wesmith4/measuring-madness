@@ -112,14 +112,17 @@ with right_col:
 # sortByMean
 # sortByVar
 
-year = st.sidebar.slider('Year', min_value=1990, max_value=2021,value=2021,step=1)
+st.markdown('# Bracket Viewer')
+year = st.slider('Year', min_value=1990, max_value=2021,value=2021,step=1)
 
 regions = getBrackets(year)
 
-region  = st.sidebar.selectbox('Region', list(regions.keys()))
+region  = st.selectbox('Region', list(regions.keys()))
 
 selectedBracket = regions[region]
 
+
+st.markdown('## {} - {} bracket'.format(year,region))
 components.html(selectedBracket.encode('utf-8') + """
     <style>
         body {
