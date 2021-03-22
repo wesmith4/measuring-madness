@@ -10,6 +10,7 @@ import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
 import streamlit as st
+import streamlit.components.v1 as components
 
 pageContainer = st.beta_container()
 with pageContainer:
@@ -31,6 +32,16 @@ def getWinners(round):
             seeds.append(int(team.find('span').string))
     return seeds
 
+def getBrackets(year):
+    pageaddress = 'https://www.sports-reference.com/cbb/postseason/{}-ncaa.html'.format(year)
+    soup = BeautifulSoup(urlopen(pageaddress), "html.parser")
+    bracketDiv = soup.find_all('div', {'id': 'brackets'})[0]
+
+    regions = bracketDiv.findChildren('div',recursive=False)[0:4]
+    regionBrackets = {}
+    for region in regions:
+        regionBrackets[region.get('id')] = region.find_all('div', {'id': 'bracket'})[0]
+    return regionBrackets
 
 @st.cache
 # %%
@@ -101,3 +112,12 @@ with right_col:
 # sortByMean
 # sortByVar
 
+year = st.sidebar.slider('Year', min_value=1990, max_value=2021,value=2021,step=1)
+
+regions = getBrackets(year)
+
+region  = st.sidebar.selectbox('Region', list(regions.keys()))
+
+selectedBracket = regions[region]
+
+components.html(selectedBracket.encode('utf-8'), height=1000)
