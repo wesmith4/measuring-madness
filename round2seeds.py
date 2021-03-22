@@ -120,4 +120,111 @@ region  = st.sidebar.selectbox('Region', list(regions.keys()))
 
 selectedBracket = regions[region]
 
-components.html(selectedBracket.encode('utf-8'), height=1000)
+components.html(selectedBracket.encode('utf-8') + """
+    <style>
+        body {
+            position: relative;
+            background: #c9cbcd;
+            z-index: 0;
+            -webkit-text-size-adjust: none;
+            -moz-text-size-adjust: none;
+            -ms-text-size-adjust: none;
+        }
+
+        .switcher_content>div.current {
+            display: block;
+        }
+
+        #bracket {
+            background-color: #fff;
+            padding: 10px;
+            width: 98%;
+            width: calc(100% - 20px);
+            display: flex;
+            height: 600px;
+            overflow-y: auto;
+        }
+
+        #bracket .round {
+            display: flex;
+            flex-wrap: wrap;
+            width: 19%;
+            min-width: 220px;
+            justify-content: space-between;
+        }
+
+        #bracket .round>div {
+            width: 100%;
+            position: relative;
+        }
+
+        #bracket .round>div>div {
+            position: absolute;
+            bottom: 0;
+            padding-bottom: 2px;
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            width: 100%;
+            height: calc(50% - 2px);
+            display: flex;
+            align-items: flex-end;
+        }
+
+        #bracket .round>div>div:first-child {
+            bottom: 50%;
+            border-right: 0;
+        }
+
+        #bracket .round:nth-child(2) {
+            margin-bottom: 19px;
+            margin-top: -19px;
+        }
+
+        #bracket .round:nth-child(3) {
+            margin-bottom: 57px;
+            margin-top: -57px;
+        }
+
+        #bracket .round:nth-child(4) {
+            margin-bottom: 131px;
+            margin-top: -131px;
+        }
+
+        #bracket .round:nth-child(5) {
+            margin-top: 3%;
+        }
+
+        #bracket .round>div>div>span {
+            width: 20px;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        #bracket .round>div>div>* {
+            display: inline-block;
+            margin-right: 5px;
+            white-space: nowrap;
+        }
+
+        #bracket .round>div>div>a+a {
+            margin: 0 10px 0 auto;
+        }
+
+        #bracket .round>div>span {
+            position: absolute;
+            color: #555;
+            font-size: .785714286em;
+            right: 10px;
+            bottom: 28%;
+        }
+
+        html:not(.backstop) div, html:not(.backstop) span {
+            scroll-margin: 2.5em 0 0 0;
+            scroll-snap-margin: 2.5em 0 0 0;
+        }
+
+    </style>
+
+
+
+""".encode('utf-8'), height=1000,width=1200)
