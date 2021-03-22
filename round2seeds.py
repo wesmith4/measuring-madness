@@ -10,6 +10,7 @@ import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
 import streamlit as st
+st.set_page_config(layout="wide")
 import streamlit.components.v1 as components
 
 pageContainer = st.beta_container()
