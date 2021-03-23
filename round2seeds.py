@@ -29,7 +29,7 @@ with left_col:
  
     main.title('Measuring the Madness')
     main.write("Looking at the average seeds of remaining teams in the March Madness tournament.")
-    main.markdown("*Note: Data for Sweet 16, Elite 8, and Final Four not yet available for 2021.*")
+    main.markdown("*Note: Data for Elite 8, and Final Four not yet available for 2021.*")
 
     round = main.radio('Tournament Round', list(roundIndices.keys()),index=0)
 
