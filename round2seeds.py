@@ -13,14 +13,25 @@ import streamlit as st
 st.set_page_config(layout="wide")
 import streamlit.components.v1 as components
 
+roundIndices = {
+    "Round of 32": 1,
+    "Sweet 16": 2,
+    "Elite 8": 3,
+    "Final Four": 4
+}
+
 pageContainer = st.beta_container()
 with pageContainer:
     left_col, right_col = st.beta_columns(2)
 
 with left_col:
     main = st.beta_container()
+ 
     main.title('Measuring the Madness')
-    main.write("Looking at the average seeds of teams that have made the second round.")
+    main.write("Looking at the average seeds of remaining teams in the March Madness tournament.")
+    main.markdown("*Note: Data for Sweet 16, Elite 8, and Final Four not yet available for 2021.*")
+
+    round = main.radio('Tournament Round', list(roundIndices.keys()),index=0)
 
 # %%
 def getWinners(round):
@@ -30,7 +41,10 @@ def getWinners(round):
     for game in games:
         teams = game.findChildren('div', recursive=False)
         for team in teams:
-            seeds.append(int(team.find('span').string))
+            try:
+                seeds.append(int(team.find('span').string))
+            except:
+                print(team.find('span').string)
     return seeds
 
 def getBrackets(year):
@@ -38,7 +52,7 @@ def getBrackets(year):
     soup = BeautifulSoup(urlopen(pageaddress), "html.parser")
     bracketDiv = soup.find_all('div', {'id': 'brackets'})[0]
 
-    regions = bracketDiv.findChildren('div',recursive=False)[0:4]
+    regions = bracketDiv.findChildren('div',recursive=False)[0:5]
     regionBrackets = {}
     for region in regions:
         regionBrackets[region.get('id')] = region.find_all('div', {'id': 'bracket'})[0]
@@ -46,34 +60,70 @@ def getBrackets(year):
 
 @st.cache
 # %%
-def getRound2Seeds(year):
+def getRoundSeeds(year):
     pageaddress = "https://www.sports-reference.com/cbb/postseason/{}-ncaa.html".format(year)
     soup = BeautifulSoup(urlopen(pageaddress), "html.parser")
     bracketDiv = soup.find_all('div', {'id': 'brackets'})[0]
     print('Finding teams from {}'.format(year))
        
-    allWinners = []
+    round32 = []
     for region in range(4):
         bracket = bracketDiv.findChildren('div',recursive=False)[region].find_all('div', {'class': 'round'})[1]
-        allWinners.extend(getWinners(bracket))
-    allWinners = np.array(allWinners)
-    
-    return allWinners
+        round32.extend(getWinners(bracket))
+    round32 = np.array(round32)
+
+    sweet16 = []
+    if year < 2020:
+        for region in range(4):
+            bracket = bracketDiv.findChildren('div',recursive=False)[region].find_all('div', {'class': 'round'})[2]
+            sweet16.extend(getWinners(bracket))
+        sweet16 = np.array(sweet16)
     
 
+    elite8 = []
+    if year < 2020:
+        for region in range(4):
+            bracket = bracketDiv.findChildren('div',recursive=False)[region].find_all('div', {'class': 'round'})[3]
+            elite8.extend(getWinners(bracket))
+        elite8 = np.array(elite8)
+
+    final4 = []
+    if year < 2020:
+        for region in range(4):
+            bracket = bracketDiv.findChildren('div',recursive=False)[region].find_all('div', {'class': 'round'})[4]
+            final4.extend(getWinners(bracket))
+        final4 = np.array(final4)
+
+    return round32,sweet16,elite8,final4
 
 # %%
-allRound2Seeds = np.zeros((len(range(1990,2022)),32))
+roundInd = roundIndices[round]
 counter = 0
+if round == "Round of 32":
+    roundSeeds = np.zeros((32,32))
+elif round == "Sweet 16":
+    roundSeeds = np.zeros((32,16))
+elif round == "Elite 8":
+    roundSeeds = np.zeros((32,8))
+elif round == "Final Four":
+    roundSeeds = np.zeros((32,4))
 for year in range(1990,2022):
     if not year == 2020:
-        allRound2Seeds[counter] = getRound2Seeds(year)
+        round32,sweet16,elite8,final4 = getRoundSeeds(year)
+        if round == "Round of 32":
+            roundSeeds[counter] = round32
+        elif round == "Sweet 16" and year < 2020:
+            roundSeeds[counter] = sweet16
+        elif round == "Elite 8" and year < 2020:
+            roundSeeds[counter] = elite8
+        elif round == "Final Four" and year < 2020:
+            roundSeeds[counter] = final4
     counter += 1
-allRound2Seeds = allRound2Seeds.astype(int)
+roundSeeds = roundSeeds.astype(int)
 
 
 # %%
-df = pd.DataFrame(allRound2Seeds)
+df = pd.DataFrame(roundSeeds)
 means = np.mean(df, axis=1)
 variances = np.var(df,axis=1)
 
@@ -85,6 +135,9 @@ stats['variance'] = variances
 stats = stats.set_index('year')
 stats = stats.drop([2020])
 
+if not round == 'Round of 32':
+    stats = stats.drop([2021])
+
 
 # %%
 fig, ax = plt.subplots()
@@ -93,7 +146,7 @@ ax.scatter(stats.index, stats.avg_seed)
 z = np.polyfit(stats.index, stats.avg_seed, 1)
 p = np.poly1d(z)
 ax.plot(stats.index,p(stats.index),"r--")
-plt.title('Average Seed of 2nd Round Teams')
+plt.title('Average Seed of {} Teams'.format(round))
 
 main.pyplot(fig)
 
@@ -114,11 +167,11 @@ with right_col:
 # sortByVar
 
 st.markdown('# Bracket Viewer')
-year = st.slider('Year', min_value=1990, max_value=2021,value=2021,step=1)
-
+spacer,col1,spacer2 = st.beta_columns([1,3,1])
+year = col1.slider('Year', min_value=1990, max_value=2021,value=2021,step=1)
 regions = getBrackets(year)
 
-region  = st.selectbox('Region', list(regions.keys()))
+region  = col1.radio('Region', list(regions.keys()))
 
 selectedBracket = regions[region]
 
@@ -128,7 +181,6 @@ components.html(selectedBracket.encode('utf-8') + """
     <style>
         body {
             position: relative;
-            background: #c9cbcd;
             z-index: 0;
             -webkit-text-size-adjust: none;
             -moz-text-size-adjust: none;
@@ -147,6 +199,14 @@ components.html(selectedBracket.encode('utf-8') + """
             display: flex;
             height: 600px;
             overflow-y: auto;
+        }
+
+        #bracket.team4 {
+            height: 150px;
+        }
+
+        #bracket.team4 .round:nth-child(3) {
+            margin-top: 91px;
         }
 
         #bracket .round {
