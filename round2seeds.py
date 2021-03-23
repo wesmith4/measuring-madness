@@ -148,7 +148,7 @@ p = np.poly1d(z)
 ax.plot(stats.index,p(stats.index),"r--")
 plt.title('Average Seed of {} Teams'.format(round))
 
-main.pyplot(fig)
+right_col.pyplot(fig)
 
 # %%
 sortByMean = stats.sort_values(by='avg_seed',ascending=False).head()
@@ -159,7 +159,7 @@ sortByVar = stats.sort_values(by='variance',ascending=False).head()
 
 
 # %%
-with right_col:
+with main:
     sideContainer = st.beta_container()
     sideContainer.dataframe(stats)
 
