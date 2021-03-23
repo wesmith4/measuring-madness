@@ -170,6 +170,7 @@ st.markdown('# Bracket Viewer')
 spacer,col1,spacer2 = st.beta_columns([1,3,1])
 year = col1.slider('Year', min_value=1990, max_value=2021,value=2021,step=1)
 regions = getBrackets(year)
+regions['final four'] = regions.pop('national')
 
 region  = col1.radio('Region', list(regions.keys()))
 
