@@ -31,8 +31,7 @@ with left_col:
     main.write("Looking at the average seeds of remaining teams in the March Madness tournament.")
     main.markdown("*Note: Data for Sweet 16, Elite 8, and Final Four not yet available for 2021.*")
 
-    subcol1,subspacer,subcol2 = main.beta_columns([3,1,3])
-    round = subcol1.radio('Tournament Round', list(roundIndices.keys()),index=0)
+    round = main.radio('Tournament Round', list(roundIndices.keys()),index=0)
 
 # %%
 def getWinners(round):
@@ -160,7 +159,7 @@ sortByVar = stats.sort_values(by='variance',ascending=False).head()
 
 
 # %%
-with subcol2:
+with main:
     sideContainer = st.beta_container()
     sideContainer.dataframe(stats)
 
