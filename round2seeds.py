@@ -73,11 +73,10 @@ def getRoundSeeds(year):
     round32 = np.array(round32)
 
     sweet16 = []
-    if year < 2020:
-        for region in range(4):
-            bracket = bracketDiv.findChildren('div',recursive=False)[region].find_all('div', {'class': 'round'})[2]
-            sweet16.extend(getWinners(bracket))
-        sweet16 = np.array(sweet16)
+    for region in range(4):
+        bracket = bracketDiv.findChildren('div',recursive=False)[region].find_all('div', {'class': 'round'})[2]
+        sweet16.extend(getWinners(bracket))
+    sweet16 = np.array(sweet16)
     
 
     elite8 = []
@@ -112,7 +111,7 @@ for year in range(1990,2022):
         round32,sweet16,elite8,final4 = getRoundSeeds(year)
         if round == "Round of 32":
             roundSeeds[counter] = round32
-        elif round == "Sweet 16" and year < 2020:
+        elif round == "Sweet 16":
             roundSeeds[counter] = sweet16
         elif round == "Elite 8" and year < 2020:
             roundSeeds[counter] = elite8
@@ -135,7 +134,7 @@ stats['variance'] = variances
 stats = stats.set_index('year')
 stats = stats.drop([2020])
 
-if not round == 'Round of 32':
+if not (round == 'Round of 32' or round == "Sweet 16"):
     stats = stats.drop([2021])
 
 
