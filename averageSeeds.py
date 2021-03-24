@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from urllib.request import urlopen
 import pandas as pd
 import numpy as np
-from matplotlib import pyplot as plt
+import plotly.express as px
 import streamlit as st
 st.set_page_config(layout="wide")
 import streamlit.components.v1 as components
@@ -138,17 +138,9 @@ if not (round == 'Round of 32' or round == "Sweet 16"):
     stats = stats.drop([2021])
 
 
-# %%
-fig, ax = plt.subplots()
-ax.scatter(stats.index, stats.avg_seed)
 
-z = np.polyfit(stats.index, stats.avg_seed, 1)
-p = np.poly1d(z)
-ax.plot(stats.index,p(stats.index),"r--")
-plt.title('Average Seed of {} Teams'.format(round))
-
-right_col.pyplot(fig)
-
+fig2 = px.scatter(x=stats.index,y=stats.avg_seed,trendline='ols', labels={'x':'Year','y':'Average Seed'})
+right_col.write(fig2)
 # %%
 sortByMean = stats.sort_values(by='avg_seed',ascending=False).head()
 
