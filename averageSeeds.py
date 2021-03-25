@@ -11,7 +11,7 @@ import numpy as np
 import plotly.express as px
 import statsmodels.api as sm
 import streamlit as st
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide", page_title='Measuring Madness')
 import streamlit.components.v1 as components
 
 roundIndices = {
