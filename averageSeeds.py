@@ -9,6 +9,7 @@ from urllib.request import urlopen
 import pandas as pd
 import numpy as np
 import plotly.express as px
+import statsmodels.api as sm
 import streamlit as st
 st.set_page_config(layout="wide")
 import streamlit.components.v1 as components
