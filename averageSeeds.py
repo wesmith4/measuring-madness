@@ -30,7 +30,7 @@ with left_col:
  
     main.title('Measuring the Madness')
     main.write("Looking at the average seeds of remaining teams in the March Madness tournament.")
-    main.markdown("*Note: Data for Elite 8, and Final Four not yet available for 2021.*")
+    main.markdown("*Note: Data for Elite 8 and Final Four not yet available for 2021.*")
 
     round = main.radio('Tournament Round', list(roundIndices.keys()),index=0)
 
@@ -142,6 +142,12 @@ if not (round == 'Round of 32' or round == "Sweet 16"):
 
 fig2 = px.scatter(x=stats.index,y=stats.avg_seed,trendline='ols', labels={'x':'Year','y':'Average Seed'})
 right_col.write(fig2)
+
+right_col.markdown("""
+## Curious about one of these years?
+Look it up in the bracket viewer below!
+
+""")
 # %%
 sortByMean = stats.sort_values(by='avg_seed',ascending=False).head()
 
