@@ -30,7 +30,7 @@ with left_col:
  
     main.title('Measuring the Madness')
     main.write("Looking at the average seeds of remaining teams in the March Madness tournament.")
-    main.markdown("*Note: Data for Elite 8 and Final Four not yet available for 2021.*")
+    main.markdown("*Note: Data for the Final Four not yet available for 2021.*")
 
     round = main.radio('Tournament Round', list(roundIndices.keys()),index=1)
 
@@ -81,11 +81,10 @@ def getRoundSeeds(year):
     
 
     elite8 = []
-    if year < 2020:
-        for region in range(4):
-            bracket = bracketDiv.findChildren('div',recursive=False)[region].find_all('div', {'class': 'round'})[3]
-            elite8.extend(getWinners(bracket))
-        elite8 = np.array(elite8)
+    for region in range(4):
+        bracket = bracketDiv.findChildren('div',recursive=False)[region].find_all('div', {'class': 'round'})[3]
+        elite8.extend(getWinners(bracket))
+    elite8 = np.array(elite8)
 
     final4 = []
     if year < 2020:
@@ -114,7 +113,7 @@ for year in range(1990,2022):
             roundSeeds[counter] = round32
         elif round == "Sweet 16":
             roundSeeds[counter] = sweet16
-        elif round == "Elite 8" and year < 2020:
+        elif round == "Elite 8":
             roundSeeds[counter] = elite8
         elif round == "Final Four" and year < 2020:
             roundSeeds[counter] = final4
@@ -135,7 +134,7 @@ stats['variance'] = variances
 stats = stats.set_index('year')
 stats = stats.drop([2020])
 
-if not (round == 'Round of 32' or round == "Sweet 16"):
+if round == "Final Four":
     stats = stats.drop([2021])
 
 
